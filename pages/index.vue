@@ -1,168 +1,269 @@
 <template>
-  <div class="container">
-    <CBox
-      v-bind="mainStyles[colorMode]"
-      d="flex"
-      w="100vw"
-      h="100vh"
-      flex-dir="column"
-      justify-content="center"
-    >
-      <CHeading text-align="center" mb="4">
-        ⚡️ Hello chakra-ui/vue
-      </CHeading>
-      <CFlex justify="center" direction="column" align="center">
-        <CBox mb="3">
-          <CIconButton
-            mr="3"
-            :icon="colorMode === 'light' ? 'moon' : 'sun'"
-            :aria-label="`Switch to ${
-              colorMode === 'light' ? 'dark' : 'light'
-            } mode`"
-            @click="toggleColorMode"
+  <div>
+    <c-flex maxWidth="100%" direction="row" align="center" justify="center" p="6" m="auto" backgroundColor="white">
+      <c-text :display="['none', null, 'block']" fontSize="md" fontWeight="bold" color="gray.600">Filter: </c-text>
+      <c-flex :direction="['column', null, 'row']" align="center" justify="center" :marginLeft="['0', null, '16']" :width="['100%', null, '75%']">
+        <c-box width="100%">
+          <v-select
+            class="select-input"
+            placeholder="Pilih Lokasi"
+            v-model="selectedRegion"
+            :options="(regions || []).map((item) => {return {label: item.name, id: item.id, name: item.full_name}})"
+            :multiple="false"
           />
-          <CButton
-            left-icon="info"
-            variant-color="blue"
-            @click="showToast"
-          >
-            Show Toast
-          </CButton>
-        </CBox>
-        <CAvatarGroup>
-          <CAvatar
-            name="Evan You"
-            alt="Evan You"
-            src="https://pbs.twimg.com/profile_images/1206997998900850688/cTXTQiHm_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Jonathan Bakebwa"
-            alt="Jonathan Bakebwa"
-            src="https://res.cloudinary.com/xtellar/image/upload/v1572857445/me_zqos4e.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar
-            name="Segun Adebayo"
-            alt="Segun Adebayo"
-            src="https://pbs.twimg.com/profile_images/1169353373012897802/skPUWd6e_400x400.jpg"
-          >
-            <CAvatarBadge size="1.0em" bg="green.500" />
-          </CAvatar>
-          <CAvatar src="pop">
-            <CAvatarBadge size="1.0em" border-color="papayawhip" bg="tomato" />
-          </CAvatar>
-        </CAvatarGroup>
-        <CButton
-          left-icon="close"
-          variant-color="red"
-          mt="3"
-          @click="showModal = true"
-        >
-          Delete Account
-        </CButton>
-        <CModal :is-open="showModal">
-          <CModalOverlay />
-          <CModalContent>
-            <CModalHeader>Are you sure?</CModalHeader>
-            <CModalBody>Deleting user cannot be undone</CModalBody>
-            <CModalFooter>
-              <CButton @click="showModal = false">
-                Cancel
-              </CButton>
-              <CButton
-                margin-left="3"
-                variant-color="red"
-                @click="showModal = false"
-              >
-                Delete User
-              </CButton>
-            </CModalFooter>
-            <CModalCloseButton @click="showModal = false" />
-          </CModalContent>
-        </CModal>
-      </CFlex>
-    </CBox>
+        </c-box>
+        <c-flex :direction="['column', 'row', 'row', 'row']" width="100%" align="center" :marginLeft="['0', null, '4']" :marginTop="['4', null, '0']">
+          <c-box width="100%">
+            <v-select
+              class="select-input"
+              v-model="selectedSize"
+              :options="sizeOptions"
+              :value="selectedSize.value"
+              :multiple="false"
+            />
+          </c-box>
+          <c-box width="100%" :marginLeft="['0', '4']" :marginTop="['2', '0']">
+            <v-select
+              class="select-input"
+              v-model="shrimpSpecies"
+              :options="[{label: 'Vannamei', value: 'vannamei'}]"
+              :multiple="false"
+              :value="shrimpSpecies"
+            />
+          </c-box>
+        </c-flex>
+      </c-flex>
+    </c-flex>
+    <c-flex :direction="['column', 'row']" maxWidth="100%" align="center" justify="center" px="8" py="4">
+      <c-box width="100%">
+        <c-image width="100%" src="/banner-1.png" alt="Banner" />
+      </c-box>
+      <c-box width="100%" :marginLeft="['0', '6']" :marginTop="['4', '0']">
+        <c-image width="100%" src="/banner-panen-udang.png" alt="Banner" />
+      </c-box>
+    </c-flex>
+    <c-flex :direction="['column', null, null, 'row']" width="100%" align="center" justify="center" px="8" py="4">
+      <c-box :width="['100%', null, '60%']">
+        <Card :header-title="`Persebaran Harga Udang ${selectedSize && selectedSize.label}`">
+          <template v-slot:body>
+            <gmap-map
+              :center="center"
+              :zoom="3"
+              map-type-id="terrain"
+            >
+              <gmap-marker
+                :key="index"
+                v-for="(m, index) in markers"
+                :position="m.position"
+                :clickable="true"
+                @click="center=m.position"
+              />
+            </gmap-map>
+          </template>
+        </Card>
+      </c-box>
+      <c-flex direction="column" :width="['100%', null, '40%']" align="flex-start" :pl="['0', null, null, '4']" :mt="['4', null, null, '0']">
+        <c-heading fontWeight="bold" textAlign="left" size="sm">
+          Trend harga di berbagai daerah
+        </c-heading>
+        <c-simple-grid width="100%" min-child-width="250px" :spacing="6" mt="4">
+          <home-card v-for="price in getPriceLocations" :key="price.id" :price="price" :size-selected="selectedSize.value" />
+        </c-simple-grid>
+      </c-flex>
+    </c-flex>
+    <c-flex :direction="['column', 'row']" maxWidth="100%" align="center" justify="center" px="8" py="4">
+      <c-box width="100%">
+        <c-image width="100%" src="/banner-produk.png" alt="Banner" />
+      </c-box>
+      <c-box width="100%" :marginLeft="['0', '6']" :marginTop="['4', '0']">
+        <c-image width="100%" src="/banner-smart-farm.jpeg" alt="Banner" />
+      </c-box>
+    </c-flex>
+    <c-flex :direction="['column', 'row']" maxWidth="100%" align="center" justify="center" px="8" py="4">
+      <Card header-title="LIST HARGA UDANG" padding="4">
+        <template v-slot:button>
+          <c-button variant-color="blue" size="xs" fontWeight="normal">
+            TAMBAHKAN HARGA
+          </c-button>
+        </template>
+        <template v-slot:body>
+          <client-only>
+            <vue-good-table
+              :columns="columnTable"
+              :rows="selectedRegion ? filteredShrimpPrices : shrimpPrices"
+              styleClass="vgt-table striped"
+              max-height="400px"
+              :rtl="false"
+              :sort-options="{
+                enabled: true,
+                initialSortBy: {field: 'date', type: 'desc'}
+              }"
+              compact-mode
+            >
+              <template slot="table-column" slot-scope="props">
+                <span v-if="props.column.label === 'Harga'">
+                  {{props.column.label}} {{selectedSize.label}}
+                </span>
+              </template>
+              <template slot="table-row" slot-scope="props">
+                <span v-if="props.column.field === 'region'">
+                  <CText color="blue.600" textAlign="left" fontWeight="bold">
+                    {{ props.row.region.province_name }} <br/>
+                    <span style="color: black; font-size: 14px; font-weight: normal;">
+                      {{ props.row.region.name }}
+                    </span>
+                  </CText>
+                </span>
+                <span v-else-if="props.column.field === 'detail-action'">
+                  <c-button as="router-link" variant-color="blue" size="sm" fontWeight="normal" :to="`/harga_udang/${props.row.id}`">
+                    LIHAT DETAIL
+                  </c-button>
+                  <font-awesome-icon icon="fa-brands fa-facebook" class="fa-2xl" style="color: #003182; margin-left: 8px;" />
+                  <font-awesome-icon icon="fa-brands fa-whatsapp" class="fa-2xl" style="color: #58C184; margin-left: 8px;" />
+                  <font-awesome-icon icon="fa-brands fa-twitter" class="fa-2xl" style="color: #0BC5EA; margin-left: 8px;" />
+                </span>
+              </template>
+            </vue-good-table>
+          </client-only>
+        </template>
+      </Card>
+    </c-flex>
   </div>
 </template>
 
-<script lang="js">
+<script>
 import {
-  CBox,
-  CButton,
-  CAvatarGroup,
-  CAvatar,
-  CAvatarBadge,
-  CModal,
-  CModalContent,
-  CModalOverlay,
-  CModalHeader,
-  CModalFooter,
-  CModalBody,
-  CModalCloseButton,
-  CIconButton,
-  CFlex,
-  CHeading
-} from '@chakra-ui/vue'
+  CBox, CFlex, CText, CImage, CButton, CHeading, CSimpleGrid, CStack,
+} from "@chakra-ui/vue";
+import VueSelect from 'vue-select';
+import shrimpPricesJson from '~/store/shrimp_prices.json';
+import Card from "~/components/Card.vue";
+import HomeCard from '~/components/home/Card.vue';
 
 export default {
-  name: 'IndexPage',
+  name: "Home",
   components: {
-    CBox,
-    CButton,
-    CAvatarGroup,
-    CAvatar,
-    CAvatarBadge,
-    CModal,
-    CModalContent,
-    CModalOverlay,
-    CModalHeader,
-    CModalFooter,
-    CModalBody,
-    CModalCloseButton,
-    CIconButton,
-    CFlex,
-    CHeading
+    CBox, CFlex, CText, CImage, CButton, CHeading, CSimpleGrid, CStack,
+    'v-select': VueSelect,
+    Card,
+    HomeCard
   },
-  inject: ['$chakraColorMode', '$toggleColorMode'],
-  data () {
+  data() {
     return {
-      showModal: false,
-      mainStyles: {
-        dark: {
-          bg: 'gray.700',
-          color: 'whiteAlpha.900'
+      regions: null,
+      selectedRegion: null,
+      shrimpPrices: null,
+      filteredShrimpPrices: null,
+      isLoading: false,
+      sizeOptions: [],
+      selectedSize: '',
+      shrimpSpecies: 'Vannamei',
+      markers: [],
+      center: {
+        lat: -7.797603,
+        lng: 110.36518
+      },
+      columnTable: [
+        {
+          label: 'TANGGAL',
+          field: 'date',
+          type: 'date',
+          dateInputFormat: 'yyyy-MM-dd',
+          dateOutputFormat: 'dd MMMM yyyy',
+          width: '200px',
+          thClass: 'vgt-left-align',
+          tdClass: 'vgt-left-align'
         },
-        light: {
-          bg: 'white',
-          color: 'gray.900'
+        {
+          label: 'LOKASI',
+          field: 'region',
+          html: true,
+          width: '250px'
+        },
+        {
+          label: 'SUPPLIER',
+          field: 'creator.name',
+          width: '250px'
+        },
+        {
+          label: 'Harga',
+          field: this.sizeShrimpFormat,
+          formatFn: (value) => {
+            if (value === null) {
+              value = 0;
+            }
+            return `Rp ${new Intl.NumberFormat(['ban', 'id']).format(value)}`
+          },
+          width: '150px'
+        },
+        {
+          label: '',
+          field: 'detail-action',
+          width: '280px',
+          sortable: false
         }
+      ]
+    }
+  },
+  created() {
+    this.isLoading = true;
+  },
+  computed: {
+    getPriceLocations() {
+      if (this.shrimpPrices) {
+        return this.shrimpPrices.slice(0, 4);
+      } else {
+        return []
       }
     }
   },
-  computed: {
-    colorMode () {
-      return this.$chakraColorMode()
-    },
-    theme () {
-      return this.$chakraTheme()
-    },
-    toggleColorMode () {
-      return this.$toggleColorMode
+  watch: {
+    selectedRegion(newVal) {
+      if (newVal !== null) {
+        this.filteredShrimpPrices = shrimpPricesJson.data.filter((item) => item.region_id === this.selectedRegion.id)
+      }
     }
   },
   methods: {
-    showToast () {
-      this.$toast({
-        title: 'Account created.',
-        description: "We've created your account for you.",
-        status: 'success',
-        duration: 10000,
-        isClosable: true
-      })
-    }
+    setSizeOptions() {
+      for (let key of Object.keys((this.shrimpPrices || [])[0])) {
+        if (key.includes('size_')) {
+          this.sizeOptions.push({
+            label: `Size ${key.split('_')[1]}`,
+            value: key
+          })
+        }
+      }
+      this.selectedSize = this.sizeOptions[3]
+    },
+    sizeShrimpFormat(rowData) {
+      return rowData[this.selectedSize.value]
+    },
+  },
+  async mounted() {
+    this.shrimpPrices = shrimpPricesJson ? shrimpPricesJson.data : null;
+    this.regions = (this.shrimpPrices || []).map((item) => item.region)
+    await this.setSizeOptions();
+
+    this.markers = (this.regions || []).map((item) => {
+      return {
+        position: {
+          lat: Number(item.latitude),
+          lng: Number(item.longitude)
+        }
+      }
+    });
+    this.isLoading = false;
   }
 }
 </script>
+
+<style scoped>
+  .select-input {
+    width: 100%;
+  }
+  .vue-map-container, .vue-map-container .vue-map {
+    width: 100%;
+    height: 100%;
+  }
+</style>

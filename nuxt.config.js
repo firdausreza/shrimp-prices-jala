@@ -18,10 +18,15 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
+    '@fortawesome/fontawesome-svg-core/styles.css'
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    { src: '~/plugins/gmap-vue', mode: 'client', ssr: false },
+    { src: '~/plugins/vue-good-table', ssr: false },
+    { src: '~/plugins/chart.js', mode: 'client' },
+    '~/plugins/fontawesome.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -41,13 +46,22 @@ export default {
     '@nuxtjs/axios'
   ],
 
+  chakra: {
+    extendTheme: {
+      breakpoints: {
+        xs: '400px'
+      }
+    }
+  },
+
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+    baseURL: '/'
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    transpile: [/^gmap-vue($|\/)/]
   }
 }

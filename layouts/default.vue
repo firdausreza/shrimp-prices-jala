@@ -1,12 +1,10 @@
 <template>
   <div class="container">
     <CThemeProvider>
-      <CColorModeProvider>
-        <CBox font-family="body" as="main">
-          <CReset />
-          <Nuxt />
-        </CBox>
-      </CColorModeProvider>
+      <CBox font-family="body" as="main" backgroundColor="gray.200">
+        <CReset />
+        <Nuxt />
+      </CBox>
     </CThemeProvider>
   </div>
 </template>
@@ -17,6 +15,7 @@ import {
   CReset,
   CBox
 } from '@chakra-ui/vue'
+import 'vue-select/dist/vue-select.css';
 
 export default {
   name: 'DefaultLayout',
