@@ -42,27 +42,42 @@
         <c-image width="100%" src="/banner-panen-udang.png" alt="Banner" />
       </c-box>
     </c-flex>
-    <c-flex :direction="['column', null, null, 'row']" width="100%" align="center" justify="center" px="8" py="4">
-      <c-box :width="['100%', null, '60%']">
+    <c-flex :direction="['column', null, null, 'row']" width="100%" align="start" justify="center" px="8" py="4">
+      <c-box :width="['100%', null, null, '60%']">
         <Card :header-title="`Persebaran Harga Udang ${selectedSize && selectedSize.label}`">
           <template v-slot:body>
-            <gmap-map
-              :center="center"
-              :zoom="3"
-              map-type-id="terrain"
-            >
-              <gmap-marker
-                :key="index"
-                v-for="(m, index) in markers"
-                :position="m.position"
-                :clickable="true"
-                @click="center=m.position"
-              />
-            </gmap-map>
+            <div class="mapouter">
+              <div class="gmap_canvas">
+                <iframe class="gmap_iframe" width="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=700&amp;height=400&amp;hl=en&amp;q=Jala Tech&amp;t=&amp;z=7&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"></iframe>
+              </div>
+              <style>.mapouter{position:relative;text-align:right;width:100%;height:350px;}.gmap_canvas {overflow:hidden;background:none!important;width:100%;height:350px;}.gmap_iframe {height:350px!important;}</style>
+            </div>
+          </template>
+          <template v-slot:footer>
+            <c-flex m="auto" p="4" align="center" justify="space-between">
+              <c-flex align="center">
+                <div style="width: 20px; height: 20px; background-color: rgb(103, 105, 99)"></div>
+                <c-text ml="1">
+                  > 1 Bulan
+                </c-text>
+              </c-flex>
+              <c-flex align="center" ml="4">
+                <div style="width: 20px; height: 20px; background-color: rgb(19, 56, 120)"></div>
+                <c-text ml="1">
+                  > 1 Minggu
+                </c-text>
+              </c-flex>
+              <c-flex align="center" ml="4">
+                <div style="width: 20px; height: 20px; background-color: rgb(27, 119, 223)"></div>
+                <c-text ml="1">
+                  Baru
+                </c-text>
+              </c-flex>
+            </c-flex>
           </template>
         </Card>
       </c-box>
-      <c-flex direction="column" :width="['100%', null, '40%']" align="flex-start" :pl="['0', null, null, '4']" :mt="['4', null, null, '0']">
+      <c-flex direction="column" :width="['100%', null, null, '40%']" align="flex-start" :pl="['0', null, null, '4']" :mt="['4', null, null, '0']">
         <c-heading fontWeight="bold" textAlign="left" size="sm">
           Trend harga di berbagai daerah
         </c-heading>

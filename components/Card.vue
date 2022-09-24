@@ -9,6 +9,7 @@
     <c-box width="100%" :p="padding" :overflowX="overflowX">
       <slot name="body"></slot>
     </c-box>
+    <slot name="footer"></slot>
   </c-flex>
 </template>
 
